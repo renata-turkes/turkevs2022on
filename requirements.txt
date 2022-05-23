@@ -1,0 +1,8 @@
+alphashape
+descartes 
+gudhi
+ripser
+tensorflow
+numpy --upgrade
+
+# pip install alphashape descartes gudhi ripser tensorflow
