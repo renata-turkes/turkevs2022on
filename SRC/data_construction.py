@@ -24,16 +24,24 @@ from matplotlib.path import Path
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn import preprocessing
+from skimage.transform import resize
+from skimage.transform import downscale_local_mean
+from skimage.morphology import convex_hull_object
+from skimage.morphology import convex_hull_image
+from skimage import img_as_float
+from skimage.util import invert
+from matplotlib import image
 import matplotlib.pyplot as plt
 
+import ph # temp, to inspect flavia dataset, will be removed later
 import plots
 
 
 
-PATH_CURRENT = "../"
+PATH_CURRENT = "../../../project_antwerp/effectiveness_of_persistent_homology/" # PATH_CURRENT = "../"
 NUM_POINT_CLOUDS = 100
-NUM_POINTS = 1000
 NUM_POINT_CLOUDS_SHAPE = 50
+NUM_POINTS = 1000
 
 
 
@@ -1056,6 +1064,92 @@ def build_dataset_convexity_random(N = NUM_POINT_CLOUDS, n = NUM_POINTS):
 
 
 
+
+#################################### REAL-WORLD FLAVIA DATASET #########################################################
+
+
+def build_dataset_flavia(ids = np.arange(1001, 1020), num_x_pixels = 20, num_y_pixels = 20): # ids = [1001, 1002]
+    num_images = len(ids)
+    data = np.full((num_images, num_x_pixels, num_y_pixels), False, dtype = bool)
+    labels = np.empty(num_images)
+    for i, id in enumerate(ids):   
+        
+        # Data observation, i.e., image.
+        im_rgb = image.imread(PATH_CURRENT + "DATASETS/flavia/" + str(id) + ".jpg")  
+        # RGB -> GRSC from Leaf Classification Using Convexity Measure of Polygons:
+        # This might be important, to higlight the green color in the leaves, so that the thin tops of leaves do not result in pixels disconnected from the leaf.
+        # im_grsc = np.mean(im_rgb, -1)
+        im_grsc = 0.2989 * im_rgb[:, :, 0] + 0.5870 * im_rgb[:, :, 1] + 0.1140 * im_rgb[:, :, 2]        
+        # GRSC -> GRSC small:
+        # im_grsc = downscale_local_mean(im_grsc, factors = (3,3))
+        im_grsc_small = resize(im_grsc, (num_x_pixels, num_y_pixels))             
+        # GRSC -> BW:
+        im_bw = im_grsc_small < 0.9 * np.max(im_grsc_small)          
+        im = im_bw       
+        data[i] = im.astype(int)
+        
+        # Label, i.e., concavity measure.
+        # convex_hull = convex_hull_object(im)
+        convex_hull = convex_hull_image(im, offset_coordinates = False) 
+        convex_hull_diff = img_as_float(convex_hull.copy())
+        convex_hull_diff[im] = 0.25        
+        # concavity_measure = np.sum(convex_hull_diff == 1) / (num_x_pixels * num_y_pixels)
+        # concavity_measure = 1 - np.sum(convex_hull_diff == 0.25) / (np.sum(convex_hull))
+        concavity_measure = 1 - np.sum(convex_hull_diff == 0.25) / (np.sum(convex_hull_diff == 0.25) + np.sum(convex_hull_diff == 1))        
+        convexity_measure = 1 - concavity_measure
+        labels[i] = np.around(convexity_measure, 5)
+        
+        # # Visualize the image, the convex hull, and the label.
+        # print("i = ", i)
+        # print("image id = ", id)
+        # print("label = convexity_measure(image) = ", labels[i])
+        # fig, axes = plt.subplots(1, 4, figsize=(8, 4))
+        # ax = axes.ravel()
+        # ax[0].imshow(im_rgb)
+        # # ax[0].set_title("raw image")
+        # ax[1].imshow(im, cmap = plt.cm.gray_r)
+        # # ax[1].set_title("image")
+        # ax[2].imshow(convex_hull, cmap = plt.cm.gray_r)
+        # # ax[2].set_title("convex hull")        
+        # ax[3].imshow(convex_hull_diff, cmap = plt.cm.gray_r, vmin = 0, vmax = 1) # In case convex_hull\image = empty.
+        # # ax[3].set_title("convex hull \ image")
+        # plt.tight_layout()
+        # plt.show()
+        # print()
+        
+        # Visualize the image, the convex hull, the label, but also the PH lifespans.
+        # PH is only calculated here so we can inspect the dataset (problematic images), it will be removed later.
+        # lifespans = ph.calculate_pd_max_lifespans_height_filtration(data[i], normalization = True)
+        # print("lifespans = ", np.around(lifespans, 3)) 
+        # print("\n\n\n\n")
+        # if np.max(lifespans) > 0.01:
+        #     print("i = ", i)
+        #     print("image id = ", id)
+        #     print("label = concavity_measure(image) = ", labels[i])
+        #     print("lifespans = ", np.around(lifespans, 3)) 
+        #     fig, axes = plt.subplots(1, 4, figsize=(8, 4))
+        #     ax = axes.ravel()
+        #     ax[0].imshow(im_rgb)
+        #     ax[0].set_title("raw image")
+        #     ax[1].imshow(im, cmap = plt.cm.gray_r)
+        #     ax[1].set_title("image")
+        #     ax[2].imshow(convex_hull, cmap = plt.cm.gray_r)
+        #     ax[2].set_title("convex hull")
+        #     ax[3].imshow(convex_hull_diff, cmap = plt.cm.gray_r)
+        #     ax[3].set_title("convex hull \ image")
+        #     plt.tight_layout()
+        #     plt.show()
+               
+    print("FLAVIA dataset of leaf images:")
+    print("data.shape = ", data.shape)
+    print("labels.shape = ", labels.shape)
+    print("Numbers of point clouds with each label value: ", collections.Counter(labels))
+    print()
+
+    return data, labels
+
+
+
 ############################################## GENERAL #################################################################
 
 
@@ -1287,8 +1381,9 @@ def calculate_rank_matrix(matrix):
 
 def import_point_clouds(name = None):      
     print("Importing point clouds...")   
-    if name == "holes" or name == "curvature" or name == "convexity":
-        with open(PATH_CURRENT + "DATASETS/" + name + "/point_clouds.pkl", "rb") as f:
+    if name == "holes" or name == "curvature" or name == "convexity" or name == "flavia":
+        with open(PATH_CURRENT + "DATASETS/" + name + "/data.pkl", "rb") as f:
+        # with open(PATH_CURRENT + "DATASETS/" + name + "/point_clouds.pkl", "rb") as f:
             point_clouds = pickle.load(f)
     else:
         print("Error: The data to import can only be one of the saved datasets: holes, curvature or convexity!")
@@ -1325,7 +1420,7 @@ def import_distance_matrices_flat(name = None):
 
 def import_labels(name = None):      
     print("Importing labels...")   
-    if name == "holes" or name == "curvature" or name == "convexity":
+    if name == "holes" or name == "curvature" or name == "convexity" or name == "flavia":
         with open(PATH_CURRENT + "DATASETS/" + name + "/labels.pkl", "rb") as f:
             labels = pickle.load(f) 
     else:

@@ -58,7 +58,7 @@ def tune_hyperparameters(data_train, labels_train):
     
     log = 12 # int(np.log2(num_features))
     # widths = np.power(2, [log-6, log-4, log-2, log]) 
-    widths = np.power(2, [log-6, log-4, log-2])
+    widths = np.power(2, [log-6, log-4, log-2, log])
     learning_rates = [0.01, 0.001]  
     print("NN shallow hyperparameters:")
     print("layer_width = ", widths)

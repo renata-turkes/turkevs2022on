@@ -328,7 +328,7 @@ def calculate_simplicial_simplex_tree(X, sim_complex = "rips", fil_fun = "distan
         # PH is not sensitive to outliers.
         fil_fun_vals_vertices = dtm(X, Y, m) 
     elif fil_fun == "height":
-         fil_fun_vals_vertices = 1- X[:, 1]
+         fil_fun_vals_vertices = 1 - X[:, 1]
             
     # print("fil_fun_vals_vertices = ", np.around(fil_fun_vals_vertices, 2))    
      # Rips and DTM filtration function: simplicial_complex = DTMRipsComplex(X, dis_matrix, k = 1, q = 2)
@@ -595,7 +595,7 @@ def calculate_and_plot_simplicial_filtration_and_pds(X, sim_complex, fil_fun, m 
     num_filtered_complexes = len(max_fil_fun_vals)
     
     num_fig_rows = 1
-    num_fig_cols = 1 + num_filtered_complexes + 2
+    num_fig_cols = 1 + num_filtered_complexes + 1 # + 2
     subfig_width = 2
     subfig_height = 2
     fig, axes = plt.subplots(num_fig_rows, num_fig_cols, figsize = (num_fig_cols * subfig_width, num_fig_rows * subfig_height)) 
@@ -603,11 +603,11 @@ def calculate_and_plot_simplicial_filtration_and_pds(X, sim_complex, fil_fun, m 
 
 
     # Plot point cloud.
-    axes[0].scatter(X[:,0], X[:,1], s = 2.5, c = "blue")       
+    axes[0].scatter(X[:,0], X[:,1], s = 2.5, c = "red")       
     axes[0].set_xlim(min_X, max_X)
     axes[0].set_ylim(min_X, max_X)
     axes[0].set_aspect("equal")
-    axes[0].set_title("Point cloud X", fontsize = 20)
+    axes[0].set_title("Point cloud", fontsize = 20)
 
 
     # Calculate simplex tree, necessary to calculate and plot the filtration and PDs. 
@@ -625,7 +625,7 @@ def calculate_and_plot_simplicial_filtration_and_pds(X, sim_complex, fil_fun, m 
                 # Plot a vertex:    
                 if len(simplex) == 1:
                     i = simplex[0]
-                    axes[ax+1].plot(X[i, 0], X[i, 1], "bo", markersize = 2) #, c = "blue")
+                    axes[ax+1].plot(X[i, 0], X[i, 1], "bo", markersize = 2, c = "red")
                 # Plot an edge:
                 elif len(simplex) == 2:
                     i = simplex[0]
@@ -659,44 +659,44 @@ def calculate_and_plot_simplicial_filtration_and_pds(X, sim_complex, fil_fun, m 
     PD1 = simplex_tree.persistence_intervals_in_dimension(1)
     t1 = time.time()
     # print("Runtime for calculation of PDs =", np.around(t1-t0, 2))
-    print("0-dim PD = \n", np.around(PD0, 2))
-    print("1-dim PD = \n", np.around(PD1, 2))
-    print("0-dim PD sorted lifespans = ", np.around(sorted_lifespans_pd(PD0, 10), 2))
-    print("1-dim PD sorted lifespans = ", np.around(sorted_lifespans_pd(PD1, 10), 2))
+    # print("0-dim PD = \n", np.around(PD0, 2))
+    # print("1-dim PD = \n", np.around(PD1, 2))
+    # print("0-dim PD sorted lifespans = ", np.around(sorted_lifespans_pd(PD0, 10), 2))
+    # print("1-dim PD sorted lifespans = ", np.around(sorted_lifespans_pd(PD1, 10), 2))
     print()
 
     # Plot 0-dim PD.
     PD0[PD0 == np.inf] = max_PD    
-    axes[num_fig_cols - 2].scatter(PD0[:, 0], PD0[:, 1], 35, c = "green")
-    x = np.arange(min_PD, max_PD, 0.01)
-    axes[num_fig_cols - 2].plot(x, x, c = 'black') # plot the diagonal  
-    intervals_unique, multiplicities = np.unique(np.around(PD0, 2), axis = 0, return_counts = True) 
-    for i, multiplicity in enumerate(multiplicities):
-        if multiplicity > 1:
-            axes[num_fig_cols - 2].annotate(multiplicity, xy = (intervals_unique[i, 0], intervals_unique[i, 1]), 
-                         ha = "left", va = "bottom", xytext = (5, 0), textcoords = "offset points", 
-                         fontsize = 15, color = "black") 
-    axes[num_fig_cols - 2].set_xlim(min_PD, max_PD)
-    axes[num_fig_cols - 2].set_ylim(min_PD, max_PD)
-    axes[num_fig_cols - 2].set_aspect("equal")
-    axes[num_fig_cols - 2].set_title("0-dim PD", fontsize = 20)
-
-    # Plot 1-dim PD.
-    PD1[PD1 == np.inf] = max_PD
-    axes[num_fig_cols - 1].scatter(PD1[:, 0], PD1[:, 1], 35, c = "green")
+    axes[num_fig_cols - 1].scatter(PD0[:, 0], PD0[:, 1], 35, c = "green")
     x = np.arange(min_PD, max_PD, 0.01)
     axes[num_fig_cols - 1].plot(x, x, c = 'black') # plot the diagonal  
-    intervals_unique, multiplicities = np.unique(np.around(PD1, 2), axis = 0, return_counts = True) 
-    # print("Persistence intervals' multiplicities = ", multiplicities)
-    for i, multiplicity in enumerate(multiplicities):
-        if multiplicity > 1:
-            axes[num_fig_cols - 1].annotate(multiplicity, xy = (intervals_unique[i, 0], intervals_unique[i, 1]), 
-                             ha = "left", va = "bottom", xytext = (5, 0), textcoords = "offset points", 
-                             fontsize = 10, color = "black")   
+    intervals_unique, multiplicities = np.unique(np.around(PD0, 2), axis = 0, return_counts = True) 
+    # for i, multiplicity in enumerate(multiplicities):
+    #     if multiplicity > 1:
+    #         axes[num_fig_cols - 2].annotate(multiplicity, xy = (intervals_unique[i, 0], intervals_unique[i, 1]), 
+    #                      ha = "left", va = "bottom", xytext = (5, 0), textcoords = "offset points", 
+    #                      fontsize = 15, color = "black") 
     axes[num_fig_cols - 1].set_xlim(min_PD, max_PD)
     axes[num_fig_cols - 1].set_ylim(min_PD, max_PD)
     axes[num_fig_cols - 1].set_aspect("equal")
-    axes[num_fig_cols - 1].set_title("1-dim PD", fontsize = 20)
+    axes[num_fig_cols - 1].set_title("0-dim PD", fontsize = 20)
+
+    # # Plot 1-dim PD.
+    # PD1[PD1 == np.inf] = max_PD
+    # axes[num_fig_cols - 1].scatter(PD1[:, 0], PD1[:, 1], 35, c = "green")
+    # x = np.arange(min_PD, max_PD, 0.01)
+    # axes[num_fig_cols - 1].plot(x, x, c = 'black') # plot the diagonal  
+    # intervals_unique, multiplicities = np.unique(np.around(PD1, 2), axis = 0, return_counts = True) 
+    # # print("Persistence intervals' multiplicities = ", multiplicities)
+    # for i, multiplicity in enumerate(multiplicities):
+    #     if multiplicity > 1:
+    #         axes[num_fig_cols - 1].annotate(multiplicity, xy = (intervals_unique[i, 0], intervals_unique[i, 1]), 
+    #                          ha = "left", va = "bottom", xytext = (5, 0), textcoords = "offset points", 
+    #                          fontsize = 10, color = "black")   
+    # axes[num_fig_cols - 1].set_xlim(min_PD, max_PD)
+    # axes[num_fig_cols - 1].set_ylim(min_PD, max_PD)
+    # axes[num_fig_cols - 1].set_aspect("equal")
+    # axes[num_fig_cols - 1].set_title("1-dim PD", fontsize = 20)
     
     
     return fig
@@ -752,7 +752,7 @@ def height_filtration_function(image, x_pixel, y_pixel):
     # fig.colorbar(plot, cax = colorbar_axes, shrink = 0.9) 
     # plt.colorbar(plot, cax = colorbar_axes, shrink = 0.9) 
     
-    print("height fil_fun_vals = \n", np.around(fil_fun_vals, 2))
+    # print("height fil_fun_vals = \n", np.around(fil_fun_vals, 2))
     
     fil_fun_vals = fil_fun_vals.reshape((num_x_pixels * num_y_pixels, ))                
     fil_fun_vals = fil_fun_vals / np.max(fil_fun_vals)
@@ -827,7 +827,7 @@ def calculate_cubical_simplex_tree(X, fil_fun = "binary", num_x_pixels = 10, num
     
     cubical_complex = gd.CubicalComplex(dimensions = [num_x_pixels, num_y_pixels], top_dimensional_cells = fil_fun_vals)
     simplex_tree = cubical_complex
-    print("simplex_tree.num_simplices() = ", simplex_tree.num_simplices())
+    # print("simplex_tree.num_simplices() = ", simplex_tree.num_simplices())
     return simplex_tree, fil_fun_vals.reshape((num_x_pixels, num_y_pixels))
     
 
@@ -852,7 +852,7 @@ def plot_cubical_filtration(fil_fun_vals, fil_fun_vals_percs = [0.1, 0.2, 0.4, 0
             for j in range(ny):
                 cub_complex[i, j] = 1 - (fil_fun_vals[i, j] <= perc * max_fil_fun_val_s)
         axes[p].matshow(cub_complex, vmin = 0, vmax = 1, cmap = plt.cm.gray_r)
-        axes[p].set_title("K_%.2f" %max_fil_fun_val_s, fontsize = 20)
+        axes[p].set_title("K_%.3f" %max_fil_fun_val_s, fontsize = 20)
         
         # title = axes[1+v].title
         # title.set_position([.5, 1.5])
@@ -866,6 +866,7 @@ def plot_cubical_filtration(fil_fun_vals, fil_fun_vals_percs = [0.1, 0.2, 0.4, 0
         
         
         
+from matplotlib.colors import ListedColormap        
 def calculate_and_plot_cubical_filtration_and_pds(X, fil_fun, max_fil_fun_vals = [0, 0.25, 0.5, 0.75, 1], min_PD = -0.25, max_PD = 1.25):
     num_filtered_complexes = len(max_fil_fun_vals)
     
@@ -875,13 +876,31 @@ def calculate_and_plot_cubical_filtration_and_pds(X, fil_fun, max_fil_fun_vals =
     subfig_width = 2
     fig, axes = plt.subplots(num_fig_rows, num_fig_cols, figsize = (num_fig_cols * subfig_width, num_fig_rows * subfig_height)) 
     fig.tight_layout(pad = 0.5) 
+    
+    # Plot the point cloud. 
+    # axes[0].scatter(X[:,0], X[:,1], s = 2.5, color = "red")  
+    # axes[0].set_xlim(0, 1)
+    # axes[0].set_ylim(0, 1)
+    # axes[0].set_aspect("equal")
+    # axes[0].set_xticks([])
+    # axes[0].set_yticks([])
+    # axes[0].set_title("Point cloud", fontsize = 20)
 
+    # axes[0].axes.get_xaxis().set_visible(False)
 
     # Calculate and plot image.
-    num_x_pixels = 10
-    num_y_pixels = 10
+    num_x_pixels = 20
+    num_y_pixels = 20
     image = data_construction.point_cloud_to_image(X, num_x_pixels, num_y_pixels)
-    axes[0].matshow(image, cmap = plt.cm.gray_r)
+    # axes[1].matshow(image, cmap = plt.cm.gray_r)
+    # axes[1].matshow(image, cmap = ListedColormap(["white", "black"]))    
+    # axes[1].set_xticks([])
+    # axes[1].set_yticks([])
+    # axes[1].set_title("Image", fontsize = 20)
+    
+    axes[0].matshow(image, cmap = ListedColormap(["white", "black"]))    
+    axes[0].set_xticks([])
+    axes[0].set_yticks([])
     axes[0].set_title("Image", fontsize = 20)
 
 
@@ -897,12 +916,17 @@ def calculate_and_plot_cubical_filtration_and_pds(X, fil_fun, max_fil_fun_vals =
         for i in range(num_x_pixels):
             for j in range(num_y_pixels):
                 cub_complex[i, j] = 1 - (fil_fun_vals[i, j] <= max_fil_fun_val)
-        axes[ax+1].matshow(cub_complex, vmin = 0, vmax = 1, cmap = plt.cm.gray_r)
+        # axes[ax+2].matshow(cub_complex, vmin = 0, vmax = 1, cmap = plt.cm.gray_r)        
+        # axes[ax+2].matshow(cub_complex, vmin = 0, vmax = 1, cmap = ListedColormap(["black", "white"]))    
+        # axes[ax+2].set_xticks([])
+        # axes[ax+2].set_yticks([])
+        # axes[ax+2].set_title("K_%.2f" %max_fil_fun_val, fontsize = 20)
+        
+        axes[ax+1].matshow(cub_complex, vmin = 0, vmax = 1, cmap = ListedColormap(["black", "white"]))    
+        axes[ax+1].set_xticks([])
+        axes[ax+1].set_yticks([])
         axes[ax+1].set_title("K_%.2f" %max_fil_fun_val, fontsize = 20)
-        # title = axes[1+v].title
-        # title.set_position([.5, 1.5])
-        # axes[1+v].set_xticks([])
-        # axes[1+v].set_yticks([])
+        
         # axes[1+v].set_xticklabels([])
         # axes[1+v].set_yticklabels([])
     
@@ -919,19 +943,17 @@ def calculate_and_plot_cubical_filtration_and_pds(X, fil_fun, max_fil_fun_vals =
 
     # Plot 0-dim PD.
     PD0[PD0 == np.inf] = max_PD
-    axes[num_fig_cols - 1].scatter(PD0[:, 0], PD0[:, 1], 40, c = "green")
+    axes[num_fig_cols - 1].scatter(PD0[:, 0], PD0[:, 1], 35, c = "green")
     x = np.arange(min_PD, max_PD, 0.01)
     axes[num_fig_cols - 1].plot(x, x, c = 'black') # plot the diagonal  
     intervals_unique, multiplicities = np.unique(PD0, axis = 0, return_counts = True) 
-    for i, multiplicity in enumerate(multiplicities):
-        if multiplicity > 1:
-            axes[num_fig_cols - 1].annotate(multiplicity, xy = (intervals_unique[i, 0], intervals_unique[i, 1]), 
-                         ha = "left", va = "bottom", xytext = (5, 0), textcoords = "offset points", 
-                         fontsize = 15, color = "black") 
+    # calculate_and_plot_simplicial_filtration_and_pds
     axes[num_fig_cols - 1].set_xlim(min_PD, max_PD)
     axes[num_fig_cols - 1].set_ylim(min_PD, max_PD)
     axes[num_fig_cols - 1].set_aspect("equal")
-    axes[num_fig_cols - 1].set_title("0-dim PD", fontsize = 20, pad = 20)
+    # axes[num_fig_cols - 1].set_xticks([])
+    # axes[num_fig_cols - 1].set_yticks([])
+    axes[num_fig_cols - 1].set_title("0-dim PD", fontsize = 20) #, pad = 20)
 
     # Plot 1-dim PD.
     # PD1[PD1 == np.inf] = max_PD
@@ -957,28 +979,200 @@ def calculate_and_plot_cubical_filtration_and_pds(X, fil_fun, max_fil_fun_vals =
 
 
 
-def calculate_pd_max_lifespans_height_filtration(X, num_x_pixels = 20, num_y_pixels = 20):
+# def calculate_pd_max_lifespans_height_filtration(X, num_x_pixels = 20, num_y_pixels = 20):
     
-    # plots.plot_point_cloud(X, path = "convexity/point_cloud")
     
-    lifespans = []
+#     # If X is a point cloud, transform it first into an image.
+#     if X.shape[1] == 2 or X.shape[1] == 3:
+#         # plots.plot_point_cloud(X, path = "convexity/point_cloud")
+#         image = data_construction.point_cloud_to_image(X, num_x_pixels, num_y_pixels)
+#     else:
+#         image = X
+#         num_x_pixels = X.shape[0]
+#         num_y_pixels = X.shape[1]
+#         # plt.matshow(image, cmap = plt.cm.gray_r)
+#         # plt.title("Image", fontsize = 20)
+#         # plt.savefig("convexity/image", bbox_inches = "tight")      
+#         # plt.show()   
     
-    nx = num_x_pixels
-    ny = num_y_pixels    
+#     lifespans = []
     
-    # Image.
-    image = data_construction.point_cloud_to_image(X, num_x_pixels, num_y_pixels)
-    # plt.matshow(image, cmap = plt.cm.gray_r)
-    # plt.title("Image", fontsize = 20)
-    # plt.savefig("convexity/image", bbox_inches = "tight")      
-    # plt.show()
+#     nx = num_x_pixels
+#     ny = num_y_pixels    
+    
+#     # Filtration function.    
+#     nxm = int(nx/2)
+#     nym = int(ny/2)
+#     pixels_orig = np.array([[0, 0], [0, nym], [0, ny-1], [nxm, ny-1], [nx-1, ny-1], [nx-1, nym], [nx-1, 0], [nxm, 0], [nxm, nym]])
+#     pixels_dir = np.array([[0+1, 0+1], [0+1, nym], [0+1, ny-1-1], [nxm, ny-1-1], [nx-1-1, ny-1-1], [nx-1-1, nym], [nx-1-1, 0+1], [nxm, 0+1], [nxm-1, nym]])
+#     num_height_dirs = len(pixels_dir)
+#     for p in range(num_height_dirs):
+#         pixel_orig = pixels_orig[p]
+#         pixel_dir = pixels_dir[p]
+ 
+#         # Summarize and visualize origin and direction pixel.
+#         # print("\n\n\n")
+#         # print("pixel_orig = ", pixel_orig)
+#         # print("pixel_dir = ", pixel_dir)        
+#         # image_orig = np.zeros((num_x_pixels, num_y_pixels), dtype = np.int8)   
+#         # u = pixel_orig[0]
+#         # v = pixel_orig[1]
+#         # image_orig[u, v] = 1    
+#         # plt.matshow(image_orig)
+#         # plt.title("Origin pixel for height filtration")
+#         # plt.show()
+#         # image_dir = np.zeros((num_x_pixels, num_y_pixels), dtype = np.int8)   
+#         # u = pixel_dir[0]
+#         # v = pixel_dir[1]
+#         # image_dir[u, v] = 1    
+#         # plt.matshow(image_dir)
+#         # plt.title("Direction pixel for height filtration")
+#         # plt.show()
 
-      
-    # Filtration function.    
+#         # Calculate filtration function.
+#         fil_fun_vals = np.zeros((nx, ny))
+#         for i in range(nx):
+#             for j in range(ny):
+#                 point = np.array([i, j])
+#                 vector_1 = pixel_orig - point
+#                 vector_2 = pixel_orig - pixel_dir
+#                 fil_fun_vals[i, j] = np.dot(vector_1, vector_2)              
+#                 # When the origin pixel is in the middle of the image,
+#                 # half of the filtration function values will be negative,
+#                 # so we need to change this.
+#                 fil_fun_vals[i, j] = np.abs(fil_fun_vals[i, j])        
+#         fil_fun_vals[image == 0] = 1 * np.max(fil_fun_vals)  
+#         fil_fun_vals = fil_fun_vals / np.max(fil_fun_vals)    
+        
+#         # Summarize and visualize filtration function.
+#         # print("height fil_fun_vals = \n", np.around(fil_fun_vals, 2)) 
+#         # plot = plt.matshow(fil_fun_vals, cmap = "hot") # cmap = plt.cm.gray_r)
+#         # plt.title("filtration\nfunction", fontsize = 20, pad = 10)
+#         # plt.colorbar(plot) #, orientation = "horizontal")
+#         # plt.show()   
+        
+#         # plot_cubical_filtration(fil_fun_vals, path = "convexity/filtration_direction_%d" %(p+1))
+
+#         fil_fun_vals = fil_fun_vals.reshape((num_x_pixels * num_y_pixels, ))                
+
+        
+#         # PDs.
+#         cubical_complex = gd.CubicalComplex(dimensions = [nx, ny], top_dimensional_cells = fil_fun_vals)
+#         simplex_tree = cubical_complex
+#         simplex_tree.persistence() 
+#         PD0 = simplex_tree.persistence_intervals_in_dimension(0)
+#         # PD1 = simplex_tree.persistence_intervals_in_dimension(1)
+#         # print("PD0 = ", np.around(PD0, 2))
+        
+#         # plots.plot_pd(PD0, path = "convexity/pd0_direction_%d" %(p+1))        
+        
+#         lifespan = sorted_lifespans_pd(PD0, size = 2)[1]
+#         # print("For this direction of the heigh filtration, the second largest lifespan in 0-dim PD = ", np.around(lifespan, 2))
+        
+#         lifespans.append(lifespan)
+            
+#     lifespans = np.asarray(lifespans)
+#     lifespans = np.sort(lifespans)    
+#     lifespans = np.flip(lifespans)    
+#     # print("lifespans = ", np.around(lifespans, 2))
+#     return lifespans
+
+
+
+def calculate_pd_max_lifespans_height_filtration(X, num_x_pixels = 20, num_y_pixels = 20, normalization = False):
+    
+    lifespans = []       
+    
+    # If X is a point cloud, transform it first into an image.
+    if X.shape[1] == 2 or X.shape[1] == 3:
+        # plots.plot_point_cloud(X, path = "convexity/point_cloud")
+        image = data_construction.point_cloud_to_image(X, num_x_pixels, num_y_pixels)
+    else:
+        image = X
+        num_x_pixels = X.shape[0]
+        num_y_pixels = X.shape[1]
+        # plt.matshow(image, cmap = plt.cm.gray_r)
+        # plt.title("Image", fontsize = 20)
+        # plt.savefig("convexity/image", bbox_inches = "tight")      
+        # plt.show()   
+       
+    
+    # Define the height filtration origins and directions.
+    nx = num_x_pixels
+    ny = num_y_pixels        
     nxm = int(nx/2)
     nym = int(ny/2)
-    pixels_orig = np.array([[0, 0], [0, nym], [0, ny-1], [nxm, ny-1], [nx-1, ny-1], [nx-1, nym], [nx-1, 0], [nxm, 0], [nxm, nym]])
-    pixels_dir = np.array([[0+1, 0+1], [0+1, nym], [0+1, ny-1-1], [nxm, ny-1-1], [nx-1-1, ny-1-1], [nx-1-1, nym], [nx-1-1, 0+1], [nxm, 0+1], [nxm-1, nym]])
+    
+    if normalization == False:
+        pixels_orig = np.array([[0, 0], [0, nym], [0, ny-1], [nxm, ny-1], [nx-1, ny-1], [nx-1, nym], [nx-1, 0], [nxm, 0], [nxm, nym]])
+        # pixels_dir = np.array([[0+1, 0+1], [0+1, nym], [0+1, ny-1-1], [nxm, ny-1-1], [nx-1-1, ny-1-1], [nx-1-1, nym], [nx-1-1, 0+1], [nxm, 0+1], [nxm-1, nym]])
+    else:
+        
+        area_image = np.sum(image == 0)
+        
+        pixels_orig = np.empty((9, 2), dtype = "int")       
+        x_y_nonzero_image = np.argwhere(image != 0)
+        xs_nonzero = x_y_nonzero_image[:, 0]
+        ys_nonzero = x_y_nonzero_image[:, 1]        
+        
+        # Direction 0: top left corner of the image object.       
+        x_nonzero = xs_nonzero[np.argmin(ys_nonzero)]
+        y_nonzero = np.min(ys_nonzero)
+        pixels_orig[0] = np.asarray([x_nonzero, y_nonzero])
+        
+        # Direction 1: top middle corner of the image object.           
+        y_nonzero = int(np.mean(ys_nonzero))
+        x_nonzero = np.min(np.nonzero(image[:, y_nonzero]))
+        pixels_orig[1] = np.asarray([x_nonzero, y_nonzero])
+        
+        # Direction 2: top right corner of the image object.
+        x_nonzero = xs_nonzero[np.argmax(ys_nonzero)]
+        y_nonzero = np.max(ys_nonzero)
+        pixels_orig[2] = np.asarray([x_nonzero, y_nonzero])
+       
+        # Direction 3: middle right corner of the image object.        
+        x_nonzero = int(np.mean(xs_nonzero))
+        y_nonzero = np.max(np.nonzero(image[x_nonzero, :]))
+        pixels_orig[3] = np.asarray([x_nonzero, y_nonzero])
+        
+        # Direction 4: bottom right corner of the image object.
+        x_nonzero = xs_nonzero[np.argmax(ys_nonzero)]
+        y_nonzero = np.max(ys_nonzero)
+        pixels_orig[4] = np.asarray([x_nonzero, y_nonzero])
+        
+        # Direction 5: bottom middle corner of the image object.
+        y_nonzero = int(np.mean(ys_nonzero))              
+        x_nonzero = np.max(np.nonzero(image[:, y_nonzero]))
+        pixels_orig[5] = np.asarray([x_nonzero, y_nonzero])
+       
+        # Direction 6: bottom left corner of the image object.       
+        y_nonzero = ys_nonzero[np.argmax(xs_nonzero)]
+        x_nonzero = np.max(xs_nonzero)        
+        pixels_orig[6] = np.asarray([x_nonzero, y_nonzero])
+        
+        # Direction 7: middle left corner of the image object.
+        x_nonzero = int(np.mean(xs_nonzero))        
+        y_nonzero = np.min(np.nonzero(image[x_nonzero, :]))
+        pixels_orig[7] = np.asarray([x_nonzero, y_nonzero])
+        
+        # Direction 8: center of the image.
+        x_nonzero = int(np.mean(xs_nonzero))  
+        y_nonzero = int(np.mean(ys_nonzero))  
+        pixels_orig[8] = np.asarray([x_nonzero, y_nonzero])
+        
+    pixels_dir = np.empty((9, 2), dtype = "int")  
+    pixels_dir[0] = pixels_orig[0] + np.asarray([1, 1])
+    pixels_dir[1] = pixels_orig[1] + np.asarray([1, 0])
+    pixels_dir[2] = pixels_orig[2] + np.asarray([1, -1])
+    pixels_dir[3] = pixels_orig[3] + np.asarray([0, -1])
+    pixels_dir[4] = pixels_orig[4] + np.asarray([-1, -1])
+    pixels_dir[5] = pixels_orig[5] + np.asarray([-1, 0])
+    pixels_dir[6] = pixels_orig[6] + np.asarray([-1, 1])
+    pixels_dir[7] = pixels_orig[7] + np.asarray([0, 1])
+    pixels_dir[8] = pixels_orig[8] + np.asarray([-1, 0])
+    
+    
+    # For each of the height filtration directions, calculate the filtration and PD.
     num_height_dirs = len(pixels_dir)
     for p in range(num_height_dirs):
         pixel_orig = pixels_orig[p]
@@ -986,19 +1180,20 @@ def calculate_pd_max_lifespans_height_filtration(X, num_x_pixels = 20, num_y_pix
  
         # Summarize and visualize origin and direction pixel.
         # print("\n\n\n")
+        # print("height filtration direction = ", p)
         # print("pixel_orig = ", pixel_orig)
         # print("pixel_dir = ", pixel_dir)        
-        # image_orig = np.zeros((num_x_pixels, num_y_pixels), dtype = np.int8)   
+        # image_orig = 0.5 * np.copy(image) 
         # u = pixel_orig[0]
         # v = pixel_orig[1]
-        # image_orig[u, v] = 1    
+        # image_orig[u, v] = np.max(image)    
         # plt.matshow(image_orig)
         # plt.title("Origin pixel for height filtration")
         # plt.show()
-        # image_dir = np.zeros((num_x_pixels, num_y_pixels), dtype = np.int8)   
+        # image_dir = 0.5 * np.copy(image)  
         # u = pixel_dir[0]
         # v = pixel_dir[1]
-        # image_dir[u, v] = 1    
+        # image_dir[u, v] = np.max(image)    
         # plt.matshow(image_dir)
         # plt.title("Direction pixel for height filtration")
         # plt.show()
@@ -1011,24 +1206,31 @@ def calculate_pd_max_lifespans_height_filtration(X, num_x_pixels = 20, num_y_pix
                 vector_1 = pixel_orig - point
                 vector_2 = pixel_orig - pixel_dir
                 fil_fun_vals[i, j] = np.dot(vector_1, vector_2)              
-                # When the origin pixel is in the middle of the image,
-                # half of the filtration function values will be negative,
-                # so we need to change this.
+                # When the origin pixel is within the image, some of the filtration function values will be negative.
                 fil_fun_vals[i, j] = np.abs(fil_fun_vals[i, j])        
-        fil_fun_vals[image == 0] = 1 * np.max(fil_fun_vals)  
-        fil_fun_vals = fil_fun_vals / np.max(fil_fun_vals)    
+        
+        # print("Before normalization, fil_fun_vals[7, :] = ", np.around(fil_fun_vals[7, :], 2))
+        
+        if normalization == False:
+            fil_fun_vals[image == 0] = np.sqrt(nx**2 + ny**2)
+            fil_fun_vals = fil_fun_vals / np.max(fil_fun_vals)
+        else:
+            fil_fun_vals = fil_fun_vals / area_image
+            fil_fun_vals[image == 0] = np.sqrt(nx**2+ny**2) / (nx * ny) # 1
+            fil_fun_vals = fil_fun_vals # nx * ny * fil_fun_vals            
+        
+        # print("After normalization, fil_fun_vals[7, :] = ", np.around(fil_fun_vals[7, :], 2))
+            
         
         # Summarize and visualize filtration function.
         # print("height fil_fun_vals = \n", np.around(fil_fun_vals, 2)) 
         # plot = plt.matshow(fil_fun_vals, cmap = "hot") # cmap = plt.cm.gray_r)
         # plt.title("filtration\nfunction", fontsize = 20, pad = 10)
         # plt.colorbar(plot) #, orientation = "horizontal")
-        # plt.show()   
-        
-        # plot_cubical_filtration(fil_fun_vals, path = "convexity/filtration_direction_%d" %(p+1))
+        # plt.show()           
+        # plot_cubical_filtration(fil_fun_vals, fil_fun_vals_percs = [0.1, 0.2, 0.3, 0.4, 0.5]) #, path = "convexity/filtration_direction_%d" %(p+1))
 
-        fil_fun_vals = fil_fun_vals.reshape((num_x_pixels * num_y_pixels, ))                
-
+        fil_fun_vals = fil_fun_vals.reshape((num_x_pixels * num_y_pixels, ))  
         
         # PDs.
         cubical_complex = gd.CubicalComplex(dimensions = [nx, ny], top_dimensional_cells = fil_fun_vals)
@@ -1036,33 +1238,36 @@ def calculate_pd_max_lifespans_height_filtration(X, num_x_pixels = 20, num_y_pix
         simplex_tree.persistence() 
         PD0 = simplex_tree.persistence_intervals_in_dimension(0)
         # PD1 = simplex_tree.persistence_intervals_in_dimension(1)
-        # print("PD0 = ", np.around(PD0, 2))
-        
-        # plots.plot_pd(PD0, path = "convexity/pd0_direction_%d" %(p+1))        
-        
-        lifespan = sorted_lifespans_pd(PD0, size = 2)[1]
-        # print("For this direction of the heigh filtration, the second largest lifespan in 0-dim PD = ", np.around(lifespan, 2))
-        
+        # print("PD0 = \n", np.around(PD0, 4))
+        # plots.plot_pd(PD0, xymax = 1.1 * np.max(fil_fun_vals), title = "0-dim PD") #, path = "convexity/pd0_direction_%d" %(p+1))        
+        lifespan = sorted_lifespans_pd(PD0, size = 2)[1]       
+        # print("For this direction of the heigh filtration, the second largest lifespan in 0-dim PD = ", np.around(lifespan, 3))
         lifespans.append(lifespan)
-            
+                    
     lifespans = np.asarray(lifespans)
-    lifespans = np.sort(lifespans)    
-    lifespans = np.flip(lifespans)    
+    # lifespans = np.sort(lifespans)    
+    # lifespans = np.flip(lifespans)    
     # print("lifespans = ", np.around(lifespans, 2))
     return lifespans
 
 
 
-def calculate_ph_height_point_clouds(point_clouds):
+def calculate_ph_height_point_clouds(point_clouds, normalization = False):
     print("Calculating persistence diagrams (PDs) wrt height filtration, and their lifespans, for the given dataset...")
     t0 = time.time()
-    ph = [calculate_pd_max_lifespans_height_filtration(pc) for pc in point_clouds] 
+    
+    # ph = [calculate_pd_max_lifespans_height_filtration(pc) for pc in point_clouds] 
+    ph = []
+    for i in range(point_clouds.shape[0]):
+        ph_i = calculate_pd_max_lifespans_height_filtration(point_clouds[i], normalization)
+        ph.append(ph_i)
+    
     ph = np.array(ph)
         
     # Instead of looking at the lifespans of 2nd most persisting 0-dim cycles (connected components)
     # across all directions of the height filtration, we might only look at the maximum across directions.
-    ph = np.amax(ph, axis = 1)
-    ph = ph.reshape(-1, 1)       
+    # ph = np.amax(ph, axis = 1)
+    # ph = ph.reshape(-1, 1)       
     
     # # Transform list of PDs with different number of cycles into an array of PDs with the same number of cycles.    
     # PDs_length = [len(PD) for PD in PDs]

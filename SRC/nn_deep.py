@@ -75,7 +75,7 @@ def tune_hyperparameters(data_train, labels_train, min_depth = 1, max_depth = 5)
     depths = np.linspace(min_depth, max_depth, num = 1, dtype = int)
     log = 12 # int(np.log2(num_features))   
     # widths = np.power(2, [log-6, log-4, log-2, log]) 
-    widths = np.power(2, [log-6, log-4, log-2])        
+    widths = np.power(2, [log-6, log-4, log-2, log])        
     learning_rates = [0.01, 0.001]  
     print("NN deep hyperparameters:")
     print("depths = ", depths)

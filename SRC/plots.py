@@ -66,7 +66,7 @@ def plot_point_cloud(X, xymax = 0, title = " ", path = " "):
     fig = plt.gcf()
     if path != " ":        
         fig.savefig(path, bbox_inches = "tight") 
-    # plt.show()
+    plt.show()
     # plt.clf()
     return fig
         
@@ -137,16 +137,22 @@ def plot_pd(PD, xymax = 0, title = " ", path = " "):
     ''' 
     
     PD_copy = np.copy(PD)
-    PD_copy[PD_copy == np.inf] = 0.999
+    if xymax == 0: # PD is normalized.
+        PD_copy[PD_copy == np.inf] = 1
+    else:
+         PD_copy[PD_copy == np.inf] = xymax # 0.999
+        
     
     plt.scatter(PD_copy[:, 0], PD_copy[:, 1], 40, c = "green")
     
     if xymax == 0 and len(PD_copy) != 0:
         xymax = np.max(PD_copy)    
   
-    plt.xlim(-0.01, 1.1 * xymax)
-    plt.ylim(-0.01, 1.1 * xymax)
-    x = np.arange(0, 1.1 * xymax, 0.01)
+    plt.xlim(-0.1 * xymax, 1.1 * xymax)
+    plt.ylim(-0.1 * xymax, 1.1 * xymax)
+    x = np.arange(-0.1 * xymax, 1.1 * xymax, 0.01)
+  
+
     plt.plot(x, x, c = 'black') # plot the diagonal  
     PD_approx = np.around(PD_copy, 2)
     intervals_unique, multiplicities = np.unique(PD_approx, axis = 0, return_counts = True) 
@@ -155,7 +161,7 @@ def plot_pd(PD, xymax = 0, title = " ", path = " "):
     #         plt.annotate(multiplicity, xy = (intervals_unique[i, 0], intervals_unique[i, 1]), 
     #                      ha = "left", va = "bottom", xytext = (5, 0), textcoords = "offset points", 
     #                      fontsize = 15, color = "black")   
-    plt.title(title, fontsize = 50)
+    plt.title(title, fontsize = 20)
     # plt.xticks([])
     # plt.yticks([])
     # plt.xticklabels([])

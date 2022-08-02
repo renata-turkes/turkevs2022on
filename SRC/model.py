@@ -361,8 +361,8 @@ def plot_regression_line(data, labels, model):
     axes.scatter(labels, predictions)
     axes.set_xlabel("True label", fontsize = 20)
     axes.set_ylabel("Predicted label", fontsize = 20)
-    axes.set_xlim(-2, 2)
-    axes.set_ylim(-2, 2)
+    axes.set_xlim(np.min(labels), np.max(labels))
+    axes.set_ylim(np.min(labels), np.max(labels))
     axes.set_aspect("equal")
     return fig, axes
 

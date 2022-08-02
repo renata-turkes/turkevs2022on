@@ -178,7 +178,7 @@ def tune_hyperparameters(data_train, labels_train):
                                    num_points = num_points)
         
     # Parameters.
-    nums_filters = np.power(2, [5, 6]) # [2, 4, 5, 6]
+    nums_filters = np.power(2, [4, 5, 6]) # [2, 4, 5, 6]
     learning_rates = [0.01, 0.001]  
     print("PointNet hyperparameters:")
     print("nums_filters = ", nums_filters)
